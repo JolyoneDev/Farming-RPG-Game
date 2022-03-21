@@ -4,38 +4,34 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    CharacterController cc;
     public float speed = 5;
-    bool hitWall = false;
     Vector2 movement;
-
-    void Start()
-    {
-        //cc = GetComponent<CharacterController>();
-    }
     
     void Update()
-    { 
-        if (!hitWall)
-        {
-            movement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-            movement *= speed;
-            gameObject.transform.Translate(movement * Time.deltaTime);
-            //cc.Move(movement * Time.deltaTime);
-        }
-        else
-        {
-            movement = new Vector2(0, 0);
-            cc.Move(movement * Time.deltaTime);
-        }
+    {
+        //Set Movement vector to values of X and Y player input
+        movement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+       
+        //Set the speed by multiplying with the movement vector
+        movement *= speed;
+        
+        //Move the player gameobject
+        gameObject.transform.Translate(movement * Time.deltaTime); //We use Time.deltaTime here to sync movement with the framerate
+        
+        //Set Player Rotation
+        gameObject.transform.eulerAngles = new Vector2(0, 0);
     }
 
-    void OnCollisionEnter2D(Collision2D c)
+    //When Player collides with another object
+    public void OnCollisionEnter2D(Collision2D collision)
     {
-        if (c.gameObject.tag == "Wall")
+        //If the Object is an enemy
+        if (collision.gameObject.GetComponent<Enemy>() != null)
         {
-            Debug.Log("Hit Wall");
-            //hitWall = true;
+            //reference the enemy
+            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            //damage the player
+            PlayerStats.decrementHealth(enemy.damage);
         }
     }
 }
